@@ -60,7 +60,7 @@ file_name = "selicdados2.csv"
 history = 24  # input historical time steps
 horizon = 1  # output predicted time steps
 test_ratio = 0.2  # testing data ratio
-max_evals = 5  # maximal trials for hyper parameter tuning
+max_evals = 50  # maximal trials for hyper parameter tuning
 
 model_name = 'ResNet'
 # Save the results
@@ -499,7 +499,7 @@ def plot_error(data, figsize=(12, 9), lags=24, rotation=0):
     plot_acf(data.iloc[:, 2], lags=lags, zero=False, ax=ax4)
     plt.tight_layout()
     #plt.show()
-    plt.savefig('AutoCorrelation.pdf', bbox_inches = 'tight', pad_inches = 0.1)
+    plt.savefig(str(model_name)+'_autoCorrelation.pdf', bbox_inches = 'tight', pad_inches = 0.1)
 
 
 # Now we evaluate on the test set:
