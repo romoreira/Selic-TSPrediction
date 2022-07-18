@@ -235,7 +235,6 @@ learn.fit_one_cycle(params['epochs'], lr_max=params['lr'],
 training_time = time.time() - start
 learn.plot_metrics()
 
-# %%
 """
 Evaluate the model:
 """
