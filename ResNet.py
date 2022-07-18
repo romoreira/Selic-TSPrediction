@@ -93,7 +93,7 @@ plt.xlabel('Time')
 plt.ylabel('Selic (Day)')
 plt.legend(loc='best')
 # plt.show()
-plt.savefig('training_test_split.pdf', bbox_inches = 'tight', pad_inches = 0.1)
+plt.savefig("Resultados/"+str(model_name)+'_training_test_split.pdf', bbox_inches = 'tight', pad_inches = 0.1)
 
 input_features = ['SelicDia']
 data = df[input_features].values
@@ -499,7 +499,7 @@ def plot_error(data, figsize=(12, 9), lags=24, rotation=0):
     plot_acf(data.iloc[:, 2], lags=lags, zero=False, ax=ax4)
     plt.tight_layout()
     #plt.show()
-    plt.savefig(str(model_name)+'_autoCorrelation.pdf', bbox_inches = 'tight', pad_inches = 0.1)
+    plt.savefig("Resultados/"+str(model_name)+'_autoCorrelation.pdf', bbox_inches = 'tight', pad_inches = 0.1)
 
 
 # Now we evaluate on the test set:
