@@ -1,4 +1,3 @@
-# %%
 import warnings
 warnings.filterwarnings('ignore')
 
@@ -59,15 +58,14 @@ from math import sqrt
 from sklearn.metrics import mean_squared_error, mean_absolute_error, mean_absolute_error
 
 
-
 file_name = "selicdados2.csv"
 
 history = 24  # input historical time steps
 horizon = 1  # output predicted time steps
 test_ratio = 0.2  # testing data ratio
-max_evals = 100  # maximal trials for hyper parameter tuning
+max_evals = 1  # maximal trials for hyper parameter tuning
 
-model_name = 'LSTM'
+model_name = 'ResCNN'
 # Save the results
 y_true_fn = '%s_true-%d-%d.pkl' % (model_name, history, horizon)
 y_pred_fn = '%s_pred-%d-%d.pkl' % (model_name, history, horizon)
@@ -132,28 +130,22 @@ y_valid = y_data[train_length:train_valid_length]
 X_test = x_data[train_valid_length:]
 y_test = y_data[train_valid_length:]
 
-
 X, y, splits = combine_split_data([X_train, X_valid], [y_train, y_valid])
 tfms  = [None, [TSRegression()]]
 dsets = TSDatasets(X, y, tfms=tfms, splits=splits, inplace=True)
 
 
 search_space = {
-    'batch_size': hp.choice('bs', [16, 32, 64, 128]),
-    "lr": hp.choice('lr', [0.01, 0.001, 0.0001]),
-    "epochs": hp.choice('epochs', [20, 50, 100]),  # we would also use early stopping
-    "patience": hp.choice('patience', [5, 10]),  # early stopping patience
+    'batch_size': hp.choice('bs', [16]),
+    "lr": hp.choice('lr', [0.01]),
+    "epochs": hp.choice('epochs', [2]),  # we would also use early stopping
+    "patience": hp.choice('patience', [5]),  # early stopping patience
     # "optimizer": hp.choice('optimizer', [Adam, SGD, RMSProp]),  # https://docs.fast.ai/optimizer
     "optimizer": hp.choice('optimizer', [Adam]),
     # model parameters
-    "n_layers": hp.choice('n_layers', [1, 2, 3, 4, 5]),
-    "hidden_size": hp.choice('hidden_size', [50, 100, 200]),
-    "bidirectional": hp.choice('bidirectional', [True, False])
 }
 
 
-
-# %%
 def create_model_hypopt(params):
     
     try:
@@ -161,7 +153,7 @@ def create_model_hypopt(params):
         gc.collect()
         print("Trying params:", params)
         batch_size = params["batch_size"]
-
+    
         # Create data loader
         tfms  = [None, [TSRegression()]]
         dsets = TSDatasets(X, y, tfms=tfms, splits=splits, inplace=True)
@@ -169,12 +161,7 @@ def create_model_hypopt(params):
         dls   = TSDataLoaders.from_dsets(dsets.train, dsets.valid, bs=[batch_size, batch_size], num_workers=0)
     
         # Create model
-        arch = LSTM
-        k = {
-            'n_layers': params['n_layers'],
-            'hidden_size': params['hidden_size'],
-            'bidirectional': params['bidirectional']
-        }
+        arch = ResCNN
         model = create_model(arch, d=False, dls=dls)
         print(model.__class__.__name__)
         
@@ -201,7 +188,8 @@ def create_model_hypopt(params):
         del model
         del learn
         return {'loss': val_loss, 'status': STATUS_OK} # if accuracy use '-' sign, model is optional
-    except:
+    except Exception as e:
+        print(e)
         return {'loss': None, 'status': STATUS_FAIL}
 
 # %%
@@ -212,13 +200,10 @@ best = fmin(create_model_hypopt,
     max_evals=max_evals,  # test trials
     trials=trials)
 
+# %%
 print("Best parameters:")
 print(space_eval(search_space, best))
 params = space_eval(search_space, best)
-
-# %%
-# only for debug
-# params = {'batch_size': 16, 'bidirectional': False, 'epochs': 20, 'hidden_size': 200, 'lr': 0.01, 'n_layers': 5, 'optimizer': Adam, 'patience': 10}
 
 
 # %%
@@ -226,23 +211,21 @@ X, y, splits = combine_split_data([X_train, X_valid], [y_train, y_valid])
 
 # %%
 batch_size = params["batch_size"]
-tfms = [None, [TSRegression()]]
+tfms  = [None, [TSRegression()]]
 dsets = TSDatasets(X, y, tfms=tfms, splits=splits, inplace=True)
 # set num_workers for memory bottleneck
-dls = TSDataLoaders.from_dsets(dsets.train, dsets.valid, bs=[batch_size, batch_size], num_workers=0)
+dls   = TSDataLoaders.from_dsets(dsets.train, dsets.valid, bs=[batch_size, batch_size], num_workers=0)
 
 
-arch = LSTM
-k = {
-    'n_layers': params['n_layers'],
-    'hidden_size': params['hidden_size'],
-    'bidirectional': params['bidirectional']
-}
+
+# %%
+arch = ResCNN
 model = create_model(arch, d=False, dls=dls)
 print(model.__class__.__name__)
 
 # Add a Sigmoid layer
 model = nn.Sequential(model, nn.Sigmoid())
+
 
 # %%
 learn = Learner(dls, model, metrics=[mae, rmse], opt_func=params['optimizer'])
@@ -251,6 +234,11 @@ learn.fit_one_cycle(params['epochs'], lr_max=params['lr'],
                     cbs=EarlyStoppingCallback(monitor='valid_loss', min_delta=0.0, patience=params['patience']))
 training_time = time.time() - start
 learn.plot_metrics()
+
+# %%
+"""
+Evaluate the model:
+"""
 
 # %%
 dls = learn.dls
@@ -276,26 +264,29 @@ y_pred = y_pred.reshape(y_pred.shape[0], horizon, -1)
 pickle.dump(y_pred, open(y_pred_fn, 'wb'))
 pickle.dump(y_true, open(y_true_fn, 'wb'))
 
-# %%
-"""
-The training and test time spent:
-"""
 
 # %%
 print('Training time (in seconds): ', training_time)
 print('Test time (in seconds): ', prediction_time)
 
 
+
+# %%
+"""
+Define the evaluation metrics:
+"""
+
 # %%
 def check_error(orig, pred, name_col='', index_name=''):
+    
     bias = np.mean(orig - pred)
     mse = mean_squared_error(orig, pred)
     rmse = sqrt(mean_squared_error(orig, pred))
     mae = mean_absolute_error(orig, pred)
     mape = np.mean(np.abs((orig - pred) / orig)) * 100
-
+    
     error_group = [bias, mse, rmse, mae, mape]
-    result = pd.DataFrame(error_group, index=['BIAS', 'MSE', 'RMSE', 'MAE', 'MAPE'], columns=[name_col])
+    result = pd.DataFrame(error_group, index=['BIAS','MSE','RMSE','MAE', 'MAPE'], columns=[name_col])
     result.index.name = index_name
     print("Result: " + str(result))
     return result
@@ -312,37 +303,36 @@ result = pd.DataFrame()
 # %%
 check_error(true_values, pred_values, name_col=model_name)
 
-
-# %%
 def plot_error(data, figsize=(12, 9), lags=24, rotation=0):
+    
     # Creating the column error
-    data['Error'] = data.iloc[:, 0] - data.iloc[:, 1]
-
+    data['Error'] = data.iloc[:,0] - data.iloc[:,1]
+    
     plt.figure(figsize=figsize)
-    ax1 = plt.subplot2grid((2, 2), (0, 0))
-    ax2 = plt.subplot2grid((2, 2), (0, 1))
-    ax3 = plt.subplot2grid((2, 2), (1, 0))
-    ax4 = plt.subplot2grid((2, 2), (1, 1))
-
+    ax1 = plt.subplot2grid((2,2), (0,0))
+    ax2 = plt.subplot2grid((2,2), (0,1))
+    ax3 = plt.subplot2grid((2,2), (1,0))
+    ax4 = plt.subplot2grid((2,2), (1,1))
+    
     # Plotting actual and predicted values
     ax1.plot(data.iloc[:, 0:2])
     ax1.legend(['Real', 'Pred'])
     ax1.set_title('Real Value vs Prediction')
     ax1.xaxis.set_tick_params(rotation=rotation)
-
+    
     # Error vs Predicted value
-    ax2.scatter(data.iloc[:, 1], data.iloc[:, 2])
+    ax2.scatter(data.iloc[:,1], data.iloc[:,2])
     ax2.set_xlabel('Predicted Values')
     ax2.set_ylabel('Residual')
     ax2.set_title('Residual vs Predicted Values')
-
+    
     # Residual QQ Plot
-    sm.graphics.qqplot(data.iloc[:, 2], line='r', ax=ax3)
-
+    sm.graphics.qqplot(data.iloc[:,2], line='r', ax=ax3)
+    
     # Autocorrelation Plot of residual
     plot_acf(data.iloc[:, 2], lags=lags, zero=False, ax=ax4)
     plt.tight_layout()
-    plt.show()
+    #plt.show()
     plt.savefig("Resultados/" + str(model_name) + '_autoCorrelation.pdf', bbox_inches='tight', pad_inches=0.1)
 
 
@@ -354,4 +344,7 @@ model_test.columns = ['Real']
 
 model_test['Pred'] = pred_values
 
+# %%
 plot_error(model_test, rotation=45)
+
+# %%
