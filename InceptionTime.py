@@ -75,7 +75,7 @@ file_name = "selicdados2.csv"
 history = 24  # input historical time steps
 horizon = 1  # output predicted time steps
 test_ratio = 0.2  # testing data ratio
-max_evals = 5  # maximal trials for hyper parameter tuning
+max_evals = 100  # maximal trials for hyper parameter tuning
 
 model_name = 'InceptionTime'
 # Save the results
@@ -150,11 +150,10 @@ tfms  = [None, [TSRegression()]]
 dsets = TSDatasets(X, y, tfms=tfms, splits=splits, inplace=True)
 
 
-# %%
 search_space = {
-    'batch_size': hp.choice('bs', [16]),
-    "lr": hp.choice('lr', [0.01]),
-    "epochs": hp.choice('epochs', [5]),  # we would also use early stopping
+    'batch_size': hp.choice('bs', [16, 32, 64, 128]),
+    "lr": hp.choice('lr', [0.01, 0.001, 0.0001]),
+    "epochs": hp.choice('epochs', [20, 50, 100]),  # we would also use early stopping
     "patience": hp.choice('patience', [5, 10]),  # early stopping patience
     # "optimizer": hp.choice('optimizer', [Adam, SGD, RMSProp]),  # https://docs.fast.ai/optimizer
     "optimizer": hp.choice('optimizer', [Adam]),
