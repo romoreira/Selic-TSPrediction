@@ -43,6 +43,7 @@ plt.rcParams.update(params)
 plt.style.use('seaborn-whitegrid')
 sns.set_style("white")
 
+
 # Version
 print(mpl.__version__)
 print(sns.__version__)
@@ -68,7 +69,7 @@ file_name = "selicdados2.csv"
 history = 24  # input historical time steps
 horizon = 1  # output predicted time steps
 test_ratio = 0.2  # testing data ratio
-max_evals = 1  # maximal trials for hyper parameter tuning
+max_evals = 50  # maximal trials for hyper parameter tuning
 
 model_name = 'OmniScaleCNN'
 # Save the results
@@ -141,9 +142,9 @@ dsets = TSDatasets(X, y, tfms=tfms, splits=splits, inplace=True)
 
 
 search_space = {
-    'batch_size': hp.choice('bs', [16]),
-    "lr": hp.choice('lr', [0.01]),
-    "epochs": hp.choice('epochs', [2]),  # we would also use early stopping
+    'batch_size': hp.choice('bs', [16, 32, 64, 128]),
+    "lr": hp.choice('lr', [0.01, 0.001, 0.0001]),
+    "epochs": hp.choice('epochs', [20, 50, 100]),  # we would also use early stopping
     "patience": hp.choice('patience', [5, 10]),  # early stopping patience
     # "optimizer": hp.choice('optimizer', [Adam, SGD, RMSProp]),  # https://docs.fast.ai/optimizer
     "optimizer": hp.choice('optimizer', [Adam]),
@@ -245,114 +246,6 @@ print(model.__class__.__name__)
 
 # Add a Sigmoid layer
 model = nn.Sequential(model, nn.Sigmoid())
-
-# %%
-learn = Learner(dls, model, metrics=[mae, rmse], opt_func=params['optimizer'])
-start = time.time()
-learn.fit_one_cycle(params['epochs'], lr_max=params['lr'],
-                    cbs=EarlyStoppingCallback(monitor='valid_loss', min_delta=0.0, patience=params['patience']))
-training_time = time.time() - start
-learn.plot_metrics()
-
-"""
-Evaluate the model:
-"""
-
-# %%
-dls = learn.dls
-valid_dl = dls.valid
-
-test_ds = valid_dl.dataset.add_test(X_test, y_test)  # use the test data
-test_dl = valid_dl.new(test_ds)
-print(test_dl.n)
-
-# %%
-start = time.time()
-test_probas, test_targets, test_preds = learn.get_preds(dl=test_dl, with_decoded=True, save_preds=None, save_targs=None)
-prediction_time = time.time() - start
-test_probas, test_targets, test_preds
-
-y_true = test_targets.numpy()
-y_pred = test_preds.numpy()
-
-y_true = y_true.reshape(y_true.shape[0], horizon, -1)
-y_pred = y_pred.reshape(y_pred.shape[0], horizon, -1)
-
-# %%
-pickle.dump(y_pred, open(y_pred_fn, 'wb'))
-pickle.dump(y_true, open(y_true_fn, 'wb'))
-
-# %%
-print('Training time (in seconds): ', training_time)
-print('Test time (in seconds): ', prediction_time)
-
-# %%
-"""
-Define the evaluation metrics:
-"""
-
-
-# %%
-def check_error(orig, pred, name_col='', index_name=''):
-    bias = np.mean(orig - pred)
-    mse = mean_squared_error(orig, pred)
-    rmse = sqrt(mean_squared_error(orig, pred))
-    mae = mean_absolute_error(orig, pred)
-    mape = np.mean(np.abs((orig - pred) / orig)) * 100
-
-    error_group = [bias, mse, rmse, mae, mape]
-    result = pd.DataFrame(error_group, index=['BIAS', 'MSE', 'RMSE', 'MAE', 'MAPE'], columns=[name_col])
-    result.index.name = index_name
-    print("Result: " + str(result))
-    return result
-
-
-# %%
-step_to_evalute = 0
-true_values = y_true[:, step_to_evalute]
-pred_values = y_pred[:, step_to_evalute]
-
-# %%
-result = pd.DataFrame()
-
-# %%
-check_error(true_values, pred_values, name_col=model_name)
-
-
-def plot_error(data, figsize=(12, 9), lags=24, rotation=0):
-    # Creating the column error
-    data['Error'] = data.iloc[:, 0] - data.iloc[:, 1]
-
-    plt.figure(figsize=figsize)
-    ax1 = plt.subplot2grid((2, 2), (0, 0))
-    ax2 = plt.subplot2grid((2, 2), (0, 1))
-    ax3 = plt.subplot2grid((2, 2), (1, 0))
-    ax4 = plt.subplot2grid((2, 2), (1, 1))
-
-    # Plotting actual and predicted values
-    ax1.plot(data.iloc[:, 0:2])
-    ax1.legend(['Real', 'Pred'])
-    ax1.set_title('Real Value vs Prediction')
-    ax1.xaxis.set_tick_params(rotation=rotation)
-
-    # Error vs Predicted value
-    ax2.scatter(data.iloc[:, 1], data.iloc[:, 2])
-    ax2.set_xlabel('Predicted Values')
-    ax2.set_ylabel('Residual')
-    ax2.set_title('Residual vs Predicted Values')
-
-    # Residual QQ Plot
-    sm.graphics.qqplot(data.iloc[:, 2], line='r', ax=ax3)
-
-    # Autocorrelation Plot of residual
-    plot_acf(data.iloc[:, 2], lags=lags, zero=False, ax=ax4)
-    plt.tight_layout()
-    # plt.show()
-    plt.savefig("Resultados/" + str(model_name) + '_autoCorrelation.pdf', bbox_inches='tight', pad_inches=0.1)
-
-
-target = 'SelicDia'
-
 model_test = test[[target]].copy()
 model_test.index = test.index
 model_test.columns = ['Real']
