@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="ProjectRootManager" version="2" project-jdk-name="Python 3.5" project-jdk-type="Python SDK" />
+  <component name="UnattendedHostPersistenceState">
+    <option name="openedFilesInfos">
+      <list>
+        <OpenedFileInfo>
+          <option name="caretOffset" value="0" />
+          <option name="fileUrl" value="file://$PROJECT_DIR$/README.md" />
+        </OpenedFileInfo>
+        <OpenedFileInfo>
+          <option name="caretOffset" value="10301" />
+          <option name="fileUrl" value="file://$PROJECT_DIR$/InceptionTime.py" />
+        </OpenedFileInfo>
+        <OpenedFileInfo>
+          <option name="caretOffset" value="8036" />
+          <option name="fileUrl" value="file://$PROJECT_DIR$/LSTM.py" />
+        </OpenedFileInfo>
+        <OpenedFileInfo>
+          <option name="caretOffset" value="2304" />
+          <option name="fileUrl" value="file://$PROJECT_DIR$/ResCNN.py" />
+        </OpenedFileInfo>
+        <OpenedFileInfo>
+          <option name="caretOffset" value="2353" />
+          <option name="fileUrl" value="file://$PROJECT_DIR$/OmniScaleCNN.py" />
+        </OpenedFileInfo>
+        <OpenedFileInfo>
+          <option name="caretOffset" value="2652" />
+          <option name="fileUrl" value="file://$PROJECT_DIR$/EDA_Baselines.py" />
+        </OpenedFileInfo>
+        <OpenedFileInfo>
+          <option name="caretOffset" value="12078" />
+          <option name="fileUrl" value="file://$PROJECT_DIR$/ResNet.py" />
+        </OpenedFileInfo>
+        <OpenedFileInfo>
+          <option name="caretOffset" value="0" />
+          <option name="fileUrl" value="file://$PROJECT_DIR$/Resultados/Resnet.txt" />
+        </OpenedFileInfo>
+        <OpenedFileInfo>
+          <option name="fileUrl" value="mock:///Diff" />
+        </OpenedFileInfo>
+      </list>
+    </option>
+  </component>
+</project>
