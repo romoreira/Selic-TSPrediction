@@ -1,0 +1,117 @@
+3.5.2
+0.11.2
+            SelicDia
+Data                
+1995-02-13  0.178333
+1995-02-14  0.178000
+1995-02-15  0.178000
+1995-02-16  0.177667
+1995-02-17  0.177667
+            SelicDia
+Data                
+1995-02-13  0.178333
+1995-02-14  0.178000
+1995-02-15  0.178000
+1995-02-16  0.177667
+1995-02-17  0.177667
+            SelicDia
+Data                
+2017-01-12  0.048159
+2017-01-13  0.048159
+2017-01-16  0.048159
+2017-01-17  0.048159
+2017-01-18  0.048159
+Training size:  5501
+Test size:  1376
+Test ratio:  0.20008724734622654
+                 Simple
+Training Base          
+BIAS          -0.000023
+MSE            0.000004
+RMSE           0.001997
+MAE            0.000271
+MAPE           0.289738
+SIMPLE MODEL IN THE TRAINING DATA
+                    Simple
+Testing Base              
+BIAS         -1.272529e-06
+MSE           2.089858e-07
+RMSE          4.571496e-04
+MAE           6.169113e-05
+MAPE          2.731682e-01
+SIMPLE MODEL IN THE TEST DATA
+              
+              
+BIAS -0.000046
+MSE   0.000005
+RMSE  0.002307
+MAE   0.000465
+MAPE  0.494687
+5-Hour MOVING AVERAGE MODEL ON THE TEST DATA
+                  
+                  
+BIAS -3.817587e-06
+MSE   4.597687e-07
+RMSE  6.780624e-04
+MAE   1.850734e-04
+MAPE  8.195046e-01
+              
+              
+BIAS -0.000113
+MSE   0.000013
+RMSE  0.003611
+MAE   0.001015
+MAPE  1.080096
+EXPONENTIAL MOVING AVERAGE WITH 0.50 ALPHA ON THE TEST DATA
+                  
+                  
+BIAS -6.546832e-06
+MSE   5.818962e-07
+RMSE  7.628212e-04
+MAE   3.082793e-04
+MAPE  1.365453e+00
+Exp. Moving Avg:                     Simple  5H Moving Avg  Exp. Moving Avg
+Testing Base                                              
+BIAS         -1.272529e-06  -3.817587e-06    -6.546832e-06
+MSE           2.089858e-07   4.597687e-07     5.818962e-07
+RMSE          4.571496e-04   6.780624e-04     7.628212e-04
+MAE           6.169113e-05   1.850734e-04     3.082793e-04
+MAPE          2.731682e-01   8.195046e-01     1.365453e+00
+              
+              
+BIAS -0.000001
+MSE   0.000006
+RMSE  0.002514
+MAE   0.000340
+MAPE  0.394862
+Auto Regr:                  Simple  5H Moving Avg  Exp. Moving Avg  Auto Regr.
+Training Base                                                      
+BIAS          -0.000023      -0.000046        -0.000113   -0.000001
+MSE            0.000004       0.000005         0.000013    0.000006
+RMSE           0.001997       0.002307         0.003611    0.002514
+MAE            0.000271       0.000465         0.001015    0.000340
+MAPE           0.289738       0.494687         1.080096    0.394862
+AUTO REGRESSIVE MODEL IN THE TEST DATA
+                  
+                  
+BIAS  7.250010e-05
+MSE   2.153584e-07
+RMSE  4.640673e-04
+MAE   1.354368e-04
+MAPE  5.766025e-01
+Name   ::  Test Stat > C(95%)    =>   Signif  
+ ----------------------------------------
+SelicDia ::  5.55      > 4.1296    =>   True
+    Augmented Dickey-Fuller Test on "SelicDia" 
+    -----------------------------------------------
+ Null Hypothesis: Data has unit root. Non-Stationary.
+ Significance Level    = 0.05
+ Test Statistic        = -5.9244
+ No. Lags Chosen       = 33
+ Critical value 1%     = -3.432
+ Critical value 5%     = -2.862
+ Critical value 10%    = -2.567
+ => P-Value = 0.0. Rejecting Null Hypothesis.
+ => Series is Stationary.
+
+

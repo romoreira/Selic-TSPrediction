@@ -210,21 +210,7 @@ print("Best parameters:")
 print(space_eval(search_space, best))
 params = space_eval(search_space, best)
 
-# %%
-# only for debug
-# params = {'batch_size': 16, 'epochs': 20, 'fc_dropout': 0.1, 'lr': 0.01, 'layers': [500, 500, 500], 'optimizer': Adam, 'patience': 10}
 
-# %%
-"""
-# Retrain the model with best hyperparameter
-"""
-
-# %%
-"""
-We use training data for training and validation data for (possible) early stopping:
-"""
-
-# %%
 X, y, splits = combine_split_data([X_train, X_valid], [y_train, y_valid])
 
 # %%
@@ -234,25 +220,88 @@ dsets = TSDatasets(X, y, tfms=tfms, splits=splits, inplace=True)
 # set num_workers for memory bottleneck
 dls   = TSDataLoaders.from_dsets(dsets.train, dsets.valid, bs=[batch_size, batch_size], num_workers=0)
 
-# %%
-"""
-Create the model:
-"""
 
-# %%
+
 arch = OmniScaleCNN
 model = create_model(arch, d=False, dls=dls)
 print(model.__class__.__name__)
 
-# Add a Sigmoid layer
 model = nn.Sequential(model, nn.Sigmoid())
+
+learn = Learner(dls, model, metrics=[mae, rmse], opt_func=params['optimizer'])
+start = time.time()
+learn.fit_one_cycle(params['epochs'], lr_max=params['lr'],
+                    cbs=EarlyStoppingCallback(monitor='valid_loss', min_delta=0.0, patience=params['patience']))
+training_time = time.time() - start
+learn.plot_metrics()
+
+dls = learn.dls
+valid_dl = dls.valid
+
+test_ds = valid_dl.dataset.add_test(X_test, y_test)  # use the test data
+test_dl = valid_dl.new(test_ds)
+print(test_dl.n)
+
+start = time.time()
+test_probas, test_targets, test_preds = learn.get_preds(dl=test_dl, with_decoded=True, save_preds=None, save_targs=None)
+prediction_time = time.time() - start
+test_probas, test_targets, test_preds
+
+y_true = test_targets.numpy()
+y_pred = test_preds.numpy()
+
+pickle.dump(y_pred, open(y_pred_fn, 'wb'))
+pickle.dump(y_true, open(y_true_fn, 'wb'))
+
+print('Training time (in seconds): ', training_time)
+print('Test time (in seconds): ', prediction_time)
+
+step_to_evalute = 0
+true_values = y_true[:, step_to_evalute]
+pred_values = y_pred[:, step_to_evalute]
+
+result = pd.DataFrame()
+
+target = 'SelicDia'
+
 model_test = test[[target]].copy()
 model_test.index = test.index
 model_test.columns = ['Real']
 
 model_test['Pred'] = pred_values
 
-# %%
+
+def plot_error(data, figsize=(12, 9), lags=24, rotation=0):
+    # Creating the column error
+    data['Error'] = data.iloc[:, 0] - data.iloc[:, 1]
+
+    plt.figure(figsize=figsize)
+    ax1 = plt.subplot2grid((2, 2), (0, 0))
+    ax2 = plt.subplot2grid((2, 2), (0, 1))
+    ax3 = plt.subplot2grid((2, 2), (1, 0))
+    ax4 = plt.subplot2grid((2, 2), (1, 1))
+
+    # Plotting actual and predicted values
+    ax1.plot(data.iloc[:, 0:2])
+    ax1.legend(['Real', 'Pred'])
+    ax1.set_title('Real Value vs Prediction')
+    ax1.xaxis.set_tick_params(rotation=rotation)
+
+    # Error vs Predicted value
+    ax2.scatter(data.iloc[:, 1], data.iloc[:, 2])
+    ax2.set_xlabel('Predicted Values')
+    ax2.set_ylabel('Residual')
+    ax2.set_title('Residual vs Predicted Values')
+
+    # Residual QQ Plot
+    sm.graphics.qqplot(data.iloc[:, 2], line='r', ax=ax3)
+
+    # Autocorrelation Plot of residual
+    plot_acf(data.iloc[:, 2], lags=lags, zero=False, ax=ax4)
+    plt.tight_layout()
+    plt.savefig("Resultados/" + str(model_name) + '_autoCorrelation.pdf', bbox_inches='tight', pad_inches=0.1)
+    #plt.show()
+
 plot_error(model_test, rotation=45)
 
 # %%
