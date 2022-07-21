@@ -69,7 +69,7 @@ file_name = "selicdados2.csv"
 history = 24  # input historical time steps
 horizon = 1  # output predicted time steps
 test_ratio = 0.2  # testing data ratio
-max_evals = 50  # maximal trials for hyper parameter tuning
+max_evals = 100  # maximal trials for hyper parameter tuning
 
 model_name = 'OmniScaleCNN'
 # Save the results
@@ -256,6 +256,20 @@ pickle.dump(y_true, open(y_true_fn, 'wb'))
 print('Training time (in seconds): ', training_time)
 print('Test time (in seconds): ', prediction_time)
 
+
+def check_error(orig, pred, name_col='', index_name=''):
+    bias = np.mean(orig - pred)
+    mse = mean_squared_error(orig, pred)
+    rmse = sqrt(mean_squared_error(orig, pred))
+    mae = mean_absolute_error(orig, pred)
+    mape = np.mean(np.abs((orig - pred) / orig)) * 100
+
+    error_group = [bias, mse, rmse, mae, mape]
+    result = pd.DataFrame(error_group, index=['BIAS', 'MSE', 'RMSE', 'MAE', 'MAPE'], columns=[name_col])
+    result.index.name = index_name
+    print(str(result))
+    return result
+
 step_to_evalute = 0
 true_values = y_true[:, step_to_evalute]
 pred_values = y_pred[:, step_to_evalute]
@@ -270,6 +284,7 @@ model_test.columns = ['Real']
 
 model_test['Pred'] = pred_values
 
+check_error(true_values, pred_values, name_col=model_name)
 
 def plot_error(data, figsize=(12, 9), lags=24, rotation=0):
     # Creating the column error
