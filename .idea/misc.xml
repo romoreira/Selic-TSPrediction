@@ -5,39 +5,36 @@
     <option name="openedFilesInfos">
       <list>
         <OpenedFileInfo>
-          <option name="caretOffset" value="0" />
-          <option name="fileUrl" value="file://$PROJECT_DIR$/README.md" />
-        </OpenedFileInfo>
-        <OpenedFileInfo>
           <option name="caretOffset" value="10301" />
           <option name="fileUrl" value="file://$PROJECT_DIR$/InceptionTime.py" />
+        </OpenedFileInfo>
+        <OpenedFileInfo>
+          <option name="caretOffset" value="0" />
+          <option name="fileUrl" value="file://$PROJECT_DIR$/README.md" />
         </OpenedFileInfo>
         <OpenedFileInfo>
           <option name="caretOffset" value="8036" />
           <option name="fileUrl" value="file://$PROJECT_DIR$/LSTM.py" />
         </OpenedFileInfo>
         <OpenedFileInfo>
-          <option name="caretOffset" value="2304" />
+          <option name="caretOffset" value="7887" />
           <option name="fileUrl" value="file://$PROJECT_DIR$/ResCNN.py" />
-        </OpenedFileInfo>
-        <OpenedFileInfo>
-          <option name="caretOffset" value="2353" />
-          <option name="fileUrl" value="file://$PROJECT_DIR$/OmniScaleCNN.py" />
         </OpenedFileInfo>
         <OpenedFileInfo>
           <option name="caretOffset" value="2652" />
           <option name="fileUrl" value="file://$PROJECT_DIR$/EDA_Baselines.py" />
         </OpenedFileInfo>
         <OpenedFileInfo>
-          <option name="caretOffset" value="12078" />
+          <option name="caretOffset" value="297" />
           <option name="fileUrl" value="file://$PROJECT_DIR$/ResNet.py" />
         </OpenedFileInfo>
         <OpenedFileInfo>
-          <option name="caretOffset" value="0" />
+          <option name="caretOffset" value="352" />
           <option name="fileUrl" value="file://$PROJECT_DIR$/Resultados/Resnet.txt" />
         </OpenedFileInfo>
         <OpenedFileInfo>
-          <option name="fileUrl" value="mock:///Diff" />
+          <option name="caretOffset" value="1714" />
+          <option name="fileUrl" value="file://$PROJECT_DIR$/OmniScaleCNN.py" />
         </OpenedFileInfo>
       </list>
     </option>
