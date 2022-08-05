@@ -21,8 +21,12 @@
           <option name="fileUrl" value="file://$PROJECT_DIR$/whpo/ResNet.py" />
         </OpenedFileInfo>
         <OpenedFileInfo>
-          <option name="caretOffset" value="1466" />
+          <option name="caretOffset" value="25" />
           <option name="fileUrl" value="file://$PROJECT_DIR$/whpo/OmniScaleCNN.py" />
+        </OpenedFileInfo>
+        <OpenedFileInfo>
+          <option name="caretOffset" value="106" />
+          <option name="fileUrl" value="file://$PROJECT_DIR$/whpo/experimenter.sh" />
         </OpenedFileInfo>
       </list>
     </option>

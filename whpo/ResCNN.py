@@ -204,7 +204,8 @@ def create_model_hypopt(params):
 #params = space_eval(search_space, best)
 
 """Same hyperparameter for all Models"""
-params = {'batch_size': 16, 'bidirectional': False, 'epochs': 20, 'hidden_size': 200, 'lr': 0.001, 'n_layers': 5, 'optimizer': Adam, 'patience': 10, 'nf': 16, 'ks': 20}
+
+params = {'batch_size': 16, 'bidirectional': False, 'epochs': 20, 'hidden_size': 200, 'lr': 0.001, 'n_layers': 5, 'optimizer': SGD, 'patience': 10, 'nf': 16, 'ks': 20}
 
 # %%
 X, y, splits = combine_split_data([X_train, X_valid], [y_train, y_valid])
