@@ -4,4 +4,4 @@
 ### Then, just run each of <CNN.py> according to:
     python3 <cnn.py>
 
-### The results will be printed and saved in repective results directory.
+### The results will be printed and saved in respective results directory.
