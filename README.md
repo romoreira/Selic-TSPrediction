@@ -6,6 +6,6 @@
 
 ### The results will be printed and saved in respective results directory.
 
-## References
+### References
 <a id="1">[1]</a> 
 Jiang, W. (2022). Internet traffic prediction with deep neural networks. Internet Technology Letters, 5(2), e314.
