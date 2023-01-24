@@ -28,6 +28,7 @@ from matplotlib import ticker
 from datetime import datetime, timedelta
 import statsmodels.api as sm
 from statsmodels.graphics.tsaplots import plot_acf, plot_pacf
+from torchsummary import summary
 
 # %%
 large = 22; med = 16; small = 12
@@ -210,17 +211,21 @@ def create_model_hypopt(params):
     except:
         return {'loss': None, 'status': STATUS_FAIL}
 
+"""
 trials = Trials()
 best = fmin(create_model_hypopt,
     space=search_space,
     algo=tpe.suggest,
     max_evals=max_evals,  # test trials
     trials=trials)
+"""
 
+#Only for debug
+params = {'batch_size': 32, 'bidirectional': False, 'epochs': 50, 'hidden_size': 50, 'lr': 0.01, 'n_layers': 4, 'optimizer': Adam, 'patience': 10}
 
-print("Best parameters:")
-print(space_eval(search_space, best))
-params = space_eval(search_space, best)
+#print("Best parameters:")
+#print(space_eval(search_space, best))
+#params = space_eval(search_space, best)
 
 # %%
 # only for debug
@@ -242,15 +247,33 @@ dls   = TSDataLoaders.from_dsets(dsets.train, dsets.valid, bs=[batch_size, batch
 
 # %%
 arch = InceptionTime
-k = {
-    'nf': params['nf'],
-    'ks': params['ks']
-}
+#k = {
+#    'nf': params['nf'],
+#    'ks': params['ks']
+#}
 model = create_model(arch, d=False, dls=dls)
-print(model.__class__.__name__)
+print(model)
 
 # Add a Sigmoid layer
 model = nn.Sequential(model, nn.Sigmoid())
+
+def get_n_params(model):
+    pp=0
+    for p in list(model.parameters()):
+        nn=1
+        for s in list(p.size()):
+            nn = nn*s
+        pp += nn
+    number = 0
+    for name, param in model.named_parameters():
+        print(name, param.size())
+        number = number + 1
+    print("Total of Layers: "+str(number))
+    return pp
+
+#summary(model, input_size=(2, 128,100))
+print(get_n_params(model))
+exit()
 
 
 # %%

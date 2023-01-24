@@ -21,6 +21,7 @@ from datetime import datetime, timedelta
 import statsmodels.api as sm
 from statsmodels.graphics.tsaplots import plot_acf, plot_pacf
 from sklearn.model_selection import train_test_split
+from torchsummary import summary
 
 # Commented out IPython magic to ensure Python compatibility.
 large = 22; med = 16; small = 12
@@ -224,21 +225,22 @@ def create_model_hypopt(params):
 
 # In[59]:
 
-
+"""
 trials = Trials()
 best = fmin(create_model_hypopt,
     space=search_space,
     algo=tpe.suggest,
     max_evals=max_evals,  # test trials
     trials=trials)
-
-
+"""
+#Only for debug
+params = {'batch_size': 32, 'bidirectional': False, 'epochs': 50, 'hidden_size': 50, 'lr': 0.01, 'n_layers': 4, 'optimizer': Adam, 'patience': 10}
 # In[60]:
 
 
-print("Best parameters:")
-print(space_eval(search_space, best))
-params = space_eval(search_space, best)
+#print("Best parameters:")
+#print(space_eval(search_space, best))
+#params = space_eval(search_space, best)
 
 
 # In[61]:
@@ -279,8 +281,9 @@ print(model.__class__.__name__)
 
 # Add a Sigmoid layer
 model = nn.Sequential(model, nn.Sigmoid())
-model
-
+print(model)
+summary(model, input_size=(1,100))
+exit()
 
 # Training the model:
 

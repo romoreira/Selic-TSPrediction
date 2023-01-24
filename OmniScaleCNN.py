@@ -28,6 +28,7 @@ from matplotlib import ticker
 from datetime import datetime, timedelta
 import statsmodels.api as sm
 from statsmodels.graphics.tsaplots import plot_acf, plot_pacf
+from torchsummary import summary
 
 # %%
 large = 22; med = 16; small = 12
@@ -198,18 +199,22 @@ def create_model_hypopt(params):
         return {'loss': None, 'status': STATUS_FAIL}
 
 # %%
+"""
 trials = Trials()
 best = fmin(create_model_hypopt,
     space=search_space,
     algo=tpe.suggest,
     max_evals=max_evals,  # test trials
     trials=trials)
+"""
+#Only for debug
+params = {'batch_size': 32, 'bidirectional': False, 'epochs': 50, 'hidden_size': 50, 'lr': 0.01, 'n_layers': 4, 'optimizer': Adam, 'patience': 10}
 
 # %%
-print("Best parameters:")
-print(space_eval(search_space, best))
-params = space_eval(search_space, best)
-
+#print("Best parameters:")
+#print(space_eval(search_space, best))
+#params = space_eval(search_space, best)
+#
 
 X, y, splits = combine_split_data([X_train, X_valid], [y_train, y_valid])
 
@@ -227,6 +232,10 @@ model = create_model(arch, d=False, dls=dls)
 print(model.__class__.__name__)
 
 model = nn.Sequential(model, nn.Sigmoid())
+
+print(model)
+summary(model, input_size=(1,100))
+exit()
 
 learn = Learner(dls, model, metrics=[mae, rmse], opt_func=params['optimizer'])
 start = time.time()
