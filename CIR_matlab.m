@@ -37,7 +37,7 @@ title('Série Temporal - Conjunto de Teste');
 
 % Definir uma função de log-verossimilhança para o modelo CIR
 % Estimar os parâmetros do modelo CIR usando mle
-params0 = [0.1 0.9 0.01]; % valores iniciais dos parâmetros
+params0 = [0.3505492 0.04295122 0.08127823]; % valores iniciais dos parâmetros
 lb = [0 0 0]; % limites inferiores dos parâmetros
 ub = [Inf Inf Inf]; % limites superiores dos parâmetros
 options = statset('MaxIter', 10000); % opções de otimização
@@ -51,7 +51,7 @@ CIR = cir(alpha,theta,sigma);
 
 % Simular os caminhos futuros da taxa de juros usando o objeto cir
 nPeriods = length(dataTest); % número de períodos de previsão
-nTrials = 10000; % número de simulações
+nTrials = 100000; % número de simulações
 x0 = dataTrain(end,1); % valor inicial da taxa de juros
 rng(42); % fixar a semente aleatória para reprodutibilidade
 [X,T] = simulate(CIR,nPeriods,'DeltaTime',delta,'NTRIALS',nTrials);
@@ -113,7 +113,7 @@ function logL = loglikecir(params,data,varargin)
     alpha = params(1); % velocidade de reversão à média
     theta = params(2); % nível de reversão à média
     sigma = params(3); % volatilidade
-    delta = 1/252; % intervalo de tempo
+    delta = 1/12; % intervalo de tempo
     x = data(1:end-1); % taxa de juros observada
     y = data(2:end); % taxa de juros deslocada
     c = 2*alpha/(sigma^2*(1-exp(-alpha*delta)));
