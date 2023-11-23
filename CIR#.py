@@ -50,13 +50,12 @@ plt.ylabel('Interest Rate')
 plt.title('CIR Model - Real vs Predicted')
 plt.legend()
 plt.show()
+plt.savefig("CIR#_output.pdf")
 
-mae = mean_absolute_error(r_train, r_test)
-mse = mean_squared_error(r_train, r_test)
-rmse = np.sqrt(mse)
+rmse = np.sqrt(mean_squared_error(test_data['SelicDia'], r_test)) 
+mae = mean_absolute_error(test_data['SelicDia'], r_test) 
+mse = mean_squared_error(test_data['SelicDia'], r_test)
 
 print("MAE:", mae)
 print("MSE:", mse)
 print("RMSE:", rmse)
-
-
